@@ -54,6 +54,7 @@ def viewprices(price):
             Limit 500""", (str(price)))
     return display_html(rows) 
 
+
 @app.route("/artistquery/<artist>")
 def viewartists(artist):
     rows = execute_query("""select ArtistId, Artist.Name, Track.Name, UnitPrice, Milliseconds
