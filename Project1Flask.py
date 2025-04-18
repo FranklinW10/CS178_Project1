@@ -1,41 +1,7 @@
-from flask import Flask 
-
+from flask import Flask, render_template, request
 app = Flask(__name__)
 
-@app.route('/')
-def hello():
-    return '<h2>Hello from Flask!</h2>'
-
-@app.route('/about')
-def about():
-    return '<h2>An about page!</h2>'
-
-
 from flask import render_template
-@app.route("/hello/<username>/")
-def hello_user(username):
-    return render_template('layout.html',name=username)
-
-@app.route('/repeat/<var>')
-def repeater(var):
-    result = ""
-    for i in range(10):
-        result += var
-    return result
-
-@app.route("/numchar/<var>")
-def numchar(var):
-    l = len(var)
-    return str(l)
-
-@app.route("/numvowels/<var>")
-def numvowels(var):
-    count = 0
-    for i in var:
-        if i in "aeiouAEIOU":
-            count += 1
-    return str(count)
-
 import pymysql
 import creds 
 
@@ -55,8 +21,6 @@ def execute_query(query, args=()):
     cur.close()
     return rows
 
-
-#display the sqlite query in a html table
 def display_html(rows):
     html = ""
     html += """<table><tr><th>ArtistID</th><th>Artist</th><th>Track Title</th><th>Price</th><th>Milliseconds</th></tr>"""
@@ -65,7 +29,6 @@ def display_html(rows):
         html += "<tr><td>" + str(r[0]) + "</td><td>" + str(r[1]) + "</td><td>" + str(r[2]) + "</td><td>" + str(r[3]) + "</td><td>" + str(r[4]) + "</td></tr>"
     html += "</table></body>"
     return html
-
 
 @app.route("/viewdb")
 def viewdb():
@@ -107,8 +70,6 @@ def price_form():
   return render_template('textbox.html', fieldname = "Price")
 
 
-
-
 @app.route("/pricequerytextbox", methods = ['POST'])
 def price_form_post():
   text = request.form['text']
@@ -126,12 +87,30 @@ def time_form_post():
 
 @app.route("/artistquerytextbox", methods = ['GET'])
 def artist_form():
-  return render_template('textbox.html', fieldname = "time")
+  return render_template('textbox.html', fieldname = "artist")
+
 
 @app.route("/artistquerytextbox", methods = ['POST'])
 def artist_form_post():
     text = request.form['text']
     return viewartists(text)
+
+@app.route("/CURD", methods = ['GET'])
+def selection():
+  return render_template('selectiontextbox.html', fieldname = "What would you like to queery on: artist, time, or price")
+
+@app.route("/CURD", methods = ['POST'])
+def selction_post():
+   text = request.form['text']
+   if text == "artist":
+        return artist_form()
+   if text == "time":
+      return time_form()
+   if text == "price":
+      return price_form()
+
+
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080, debug=True)
