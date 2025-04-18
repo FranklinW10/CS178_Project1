@@ -8,7 +8,7 @@ TABLE_NAME = "Album"
 dynamodb = boto3.resource('dynamodb', region_name="us-east-1")
 table = dynamodb.Table(TABLE_NAME)
 
-
+#asks the user to enter all the paramaters of the data table creating a new album, or new row of data and adding it to the table
 def create_album():
     
     AlbumTitle = input("Enter Album Name: ")
@@ -24,6 +24,7 @@ def create_album():
     New_Album = {"AlbumTitle" : AlbumTitle,"Artist" : Artist, "Length(Minuets)" : int(Length), "Release Date" : int(ReleaseDate), "Rating" : int(Rating)}
     table.put_item(Item = New_Album)
 
+#Prints out everything in a row of the data table
 def print_Album(album_dict):
     # print out the values of the Album dictionary
     print("AlbumTitle: ", album_dict["AlbumTitle"])
@@ -37,7 +38,7 @@ def print_Album(album_dict):
     print("Release Date: ",album_dict["Release Date"])
     print()
 
-
+#Loops through all rows of the data table using print album to print all paramaters in the row out
 def print_all_Albums():
     response = table.scan() #get all of the albums
     for Album in response["Items"]:
@@ -45,7 +46,8 @@ def print_all_Albums():
 
 
 
-
+#asks the user which album they would like to update and then asks what rating they would like to add. 
+#uses a try catch block keep from getting an error and terminating the code
 def update_album_rating():
     AlbumTitle=input("What is the Album Title? ")
     Ratings = (input("What is the new rating: "))
@@ -58,7 +60,7 @@ def update_album_rating():
         print('error in updating albums ratings')
     
 
-
+#delets item from the table
 def delete_album():
     table.delete_item(
     Key={
@@ -66,6 +68,7 @@ def delete_album():
         }
     )
 
+#this code is incomleate but it is supposed to return just the row of data that is specified by the user
 def query_Album():
         response = table.get_item(
         Key={
@@ -81,6 +84,10 @@ def query_Album():
         artist_list = album["Item"] 
         print(artist_list)
 
+# everything from here until def print_menu used a lot of help from chatgpt.
+#I had a lot of trouble trying to get this to work with flask and I wasnted to at least try something.
+#This part of the code still deosnt work as I only created one HTML file of the several needed.
+#If I was able to figure out how to create this on my own I would have reused the same template more.  
 @app.route('/create', methods=['GET', 'POST'])
 def create():
     if request.method == 'POST':
@@ -93,10 +100,12 @@ def create():
         return redirect(url_for('list_albums'))
     return render_template('create_album.html')
 
+
 @app.route('/albums')
 def list_albums():
     albums = print_all_Albums()
     return render_template('list_albums.html', albums=albums)
+
 
 @app.route('/update', methods=['GET', 'POST'])
 def update():
@@ -120,7 +129,8 @@ def album_detail(AlbumTitle):
         return render_template('album_detail.html', album=album)
     return f"Album {AlbumTitle} not found", 404
 
-    
+#This was the original menu and main method I created that allowed the user to select how they wanted to interact with the database. 
+#Before incorperating flask it was working and I was able to add and delete rows of data from my table. 
 def print_menu():
     print("----------------------------")
     print("Press C: to CREATE a new player")

@@ -2,3 +2,4 @@ creds.py
 ds.store
 lab10dbTesting.txt
 lab10layout.txt
+__pycache__
